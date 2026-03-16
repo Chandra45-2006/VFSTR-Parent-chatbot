@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { BarChart3, Bot, BadgeCheck, Smartphone, ArrowRight, HelpCircle, Headphones } from 'lucide-react';
 import { motion } from 'motion/react';
