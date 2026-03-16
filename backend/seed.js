@@ -16,7 +16,7 @@ async function seed() {
   await Fee.deleteMany({});
   await Academic.deleteMany({});
 
-  // Student 1 - existing
+  // Student 1 - G.NAGA CHANDRA
   const R1 = '232FA04D90';
   await Student.create({ regNo: R1, studentName: 'G.NAGA CHANDRA', parentName: 'G.SRI HARI BABU', phone: '8374654918', branch: 'CSE', year: 3, section: 'A', cgpa: 7.71 });
   await Attendance.create([
@@ -45,7 +45,7 @@ async function seed() {
 
   // Student 2 - G.NAGA SURYA
   const R2 = '231FA04268';
-  await Student.create({ regNo: R2, studentName: 'G.NAGA SURYA', parentName: 'G.SRI HARI BABU', phone: '8897506415', branch: 'CSE', year: 4, section: 'B', cgpa: 7.45 });
+  await Student.create({ regNo: R2, studentName: 'G.NAGA SURYA', parentName: 'G.SRI HARI BABU', phone: '8639319956', branch: 'CSE', year: 4, section: 'B', cgpa: 7.45 });
   await Attendance.create([
     { regNo: R2, subject: 'Machine Learning',             presentClasses: 48, totalClasses: 55, percentage: 87.27 },
     { regNo: R2, subject: 'Cloud Computing',              presentClasses: 40, totalClasses: 50, percentage: 80.00 },
@@ -71,7 +71,7 @@ async function seed() {
   ]);
   process.stdout.write('Student 2 done.\n');
 
-  // Student 3 - random generated
+  // Student 3 - K.VENKATA RAMESH
   const R3 = '233FA05112';
   await Student.create({ regNo: R3, studentName: 'K.VENKATA RAMESH', parentName: 'K.SURESH BABU', phone: '9848012345', branch: 'CSE', year: 2, section: 'C', cgpa: 8.12 });
   await Attendance.create([
@@ -96,7 +96,65 @@ async function seed() {
   ]);
   process.stdout.write('Student 3 done.\n');
 
+  // Student 4 - SK.NISSAR AHAMAD
+  const R4 = '231FA04D94';
+  await Student.create({ regNo: R4, studentName: 'SK.NISSAR AHAMAD', parentName: 'SK.ASHRAFALI', phone: '9390233652', branch: 'CSE', year: 3, section: 'C', cgpa: 8.50 });
+  await Attendance.create([
+    { regNo: R4, subject: 'Mathematics for Science',      presentClasses: 48, totalClasses: 52, percentage: 92.31 },
+    { regNo: R4, subject: 'Mobile App Development',       presentClasses: 60, totalClasses: 64, percentage: 93.75 },
+    { regNo: R4, subject: 'Computer Networks & Security', presentClasses: 42, totalClasses: 46, percentage: 91.30 },
+    { regNo: R4, subject: 'Software Engineering',         presentClasses: 55, totalClasses: 60, percentage: 91.67 },
+    { regNo: R4, subject: 'SE Lab',                       presentClasses: 27, totalClasses: 30, percentage: 90.00 },
+  ]);
+  await Exam.create([
+    { regNo: R4, subject: 'Mathematics for Science',      midMarks: 23, labMarks: 0,  finalMarks: 82 },
+    { regNo: R4, subject: 'Mobile App Development',       midMarks: 24, labMarks: 0,  finalMarks: 88 },
+    { regNo: R4, subject: 'Computer Networks & Security', midMarks: 22, labMarks: 0,  finalMarks: 85 },
+    { regNo: R4, subject: 'Software Engineering',         midMarks: 25, labMarks: 0,  finalMarks: 90 },
+    { regNo: R4, subject: 'SE Lab',                       midMarks: 0,  labMarks: 44, finalMarks: 0  },
+  ]);
+  await Fee.create({ regNo: R4, totalFee: 269100, paidFee: 269100, dueFee: 0, lastPaymentDate: new Date('2025-07-01') });
+  await Academic.create([
+    { regNo: R4, semester: 1, sgpa: 8.60, cgpa: 8.60 },
+    { regNo: R4, semester: 2, sgpa: 8.40, cgpa: 8.50 },
+    { regNo: R4, semester: 3, sgpa: 8.55, cgpa: 8.52 },
+    { regNo: R4, semester: 4, sgpa: 8.45, cgpa: 8.50 },
+    { regNo: R4, semester: 5, sgpa: 8.50, cgpa: 8.50 },
+  ]);
+  process.stdout.write('Student 4 done.\n');
+
+
+  // Student 5 - P.THARUNASRI
+  const R5 = '231FA04406';
+  await Student.create({ regNo: R5, studentName: 'P.THARUNASRI', parentName: 'P.GEETA SREENIVASARAO', phone: '9392682603', branch: 'CSE', year: 3, section: 'C', cgpa: 7.98 });
+  await Attendance.create([
+    { regNo: R5, subject: 'Mathematics for Science',      presentClasses: 47, totalClasses: 52, percentage: 90.38 },
+    { regNo: R5, subject: 'Mobile App Development',       presentClasses: 58, totalClasses: 64, percentage: 90.63 },
+    { regNo: R5, subject: 'Computer Networks & Security', presentClasses: 38, totalClasses: 46, percentage: 82.61 },
+    { regNo: R5, subject: 'Software Engineering',         presentClasses: 50, totalClasses: 58, percentage: 86.21 },
+    { regNo: R5, subject: 'SE Lab',                       presentClasses: 25, totalClasses: 28, percentage: 89.29 },
+  ]);
+  await Exam.create([
+    { regNo: R5, subject: 'Mathematics for Science',      midMarks: 21, labMarks: 0,  finalMarks: 78 },
+    { regNo: R5, subject: 'Mobile App Development',       midMarks: 22, labMarks: 0,  finalMarks: 80 },
+    { regNo: R5, subject: 'Computer Networks & Security', midMarks: 19, labMarks: 0,  finalMarks: 74 },
+    { regNo: R5, subject: 'Software Engineering',         midMarks: 23, labMarks: 0,  finalMarks: 82 },
+    { regNo: R5, subject: 'SE Lab',                       midMarks: 0,  labMarks: 40, finalMarks: 0  },
+  ]);
+  await Fee.create({ regNo: R5, totalFee: 269100, paidFee: 200000, dueFee: 69100, lastPaymentDate: new Date('2025-07-20') });
+  await Academic.create([
+    { regNo: R5, semester: 1, sgpa: 8.10, cgpa: 8.10 },
+    { regNo: R5, semester: 2, sgpa: 7.85, cgpa: 7.98 },
+    { regNo: R5, semester: 3, sgpa: 7.90, cgpa: 7.95 },
+    { regNo: R5, semester: 4, sgpa: 8.00, cgpa: 7.96 },
+    { regNo: R5, semester: 5, sgpa: 7.98, cgpa: 7.98 },
+  ]);
+  process.stdout.write('Student 5 done.\n');
   process.stdout.write('Database Seeded Successfully\n');
   process.exit(0);
 }
 seed().catch(err => { process.stdout.write('ERROR: ' + err.message + '\n'); process.exit(1); });
+
+
+
+
