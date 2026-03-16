@@ -1,22 +1,7 @@
 const Student = require('../models/Student');
 const jwt = require('jsonwebtoken');
-const axios = require('axios');
 
-const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
-
-const sendSMS = async (phone, otp) => {
-  const response = await axios.get('https://www.fast2sms.com/dev/bulkV2', {
-    params: {
-      authorization: process.env.FAST2SMS_API_KEY,
-      variables_values: otp,
-      route: 'otp',
-      numbers: phone,
-    },
-  });
-  return response.data;
-};
-
-// POST /api/auth/login
+// POST /api/auth/login — direct login, no OTP required
 const login = async (req, res) => {
   try {
     const { regNo, phone } = req.body;
@@ -31,49 +16,6 @@ const login = async (req, res) => {
 
     if (student.phone !== phone)
       return res.status(401).json({ error: 'Invalid registration number or phone number' });
-
-    const otp = generateOTP();
-    student.otp = otp;
-    student.otpExpires = new Date(Date.now() + 5 * 60 * 1000);
-    await student.save();
-
-    console.log(`\n=============================`);
-    console.log(`Generated OTP for ${regNo}: ${otp}`);
-    console.log(`=============================\n`);
-
-    try {
-      const result = await sendSMS(phone, otp);
-      console.log('Fast2SMS result:', JSON.stringify(result));
-    } catch (smsErr) {
-      console.error('Fast2SMS error:', smsErr.message);
-    }
-
-    res.json({
-      message: 'OTP sent successfully',
-      mobileLast4: phone.slice(-4),
-      devOtp: process.env.NODE_ENV !== 'production' ? otp : undefined,
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-// POST /api/auth/verify-otp
-const verifyOTP = async (req, res) => {
-  try {
-    const { regNo, otp } = req.body;
-
-    const student = await Student.findOne({ regNo: regNo.toUpperCase() });
-
-    if (!student || student.otp !== otp)
-      return res.status(401).json({ error: 'Invalid OTP. Please try again.' });
-
-    if (new Date() > student.otpExpires)
-      return res.status(401).json({ error: 'OTP expired. Please request a new one.' });
-
-    student.otp = null;
-    student.otpExpires = null;
-    await student.save();
 
     const token = jwt.sign(
       { regNo: student.regNo },
@@ -95,6 +37,11 @@ const verifyOTP = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+};
+
+// Kept for route compatibility
+const verifyOTP = async (req, res) => {
+  res.status(400).json({ error: 'OTP flow disabled.' });
 };
 
 module.exports = { login, verifyOTP };
