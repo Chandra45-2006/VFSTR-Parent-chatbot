@@ -7,7 +7,13 @@ const app = express();
 
 connectDB();
 
-app.use(cors({ origin: 'http://localhost:3001', credentials: true }));
+app.use(cors({
+  origin: [
+    'http://localhost:3001',
+    process.env.FRONTEND_URL,
+  ].filter(Boolean),
+  credentials: true
+}));
 app.use(express.json());
 
 // Test route
