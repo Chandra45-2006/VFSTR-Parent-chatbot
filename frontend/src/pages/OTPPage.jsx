@@ -11,6 +11,7 @@ export default function OTPPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [mobileLast4] = useState(localStorage.getItem('mobileLast4') || '****');
+  const devOtp = localStorage.getItem('devOtp') || null;
   const inputRefs = useRef([]);
 
   useEffect(() => { localStorage.removeItem('devOtp'); }, []);
@@ -85,6 +86,11 @@ export default function OTPPage() {
             </p>
           </div>
 
+          {devOtp && (
+              <div className="p-3 bg-blue-50 border border-blue-200 text-blue-700 rounded-xl text-sm text-center font-bold">
+                Demo OTP: {devOtp}
+              </div>
+            )}
           <form onSubmit={handleVerify} className="space-y-8">
             {error && (
               <div className="p-3 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm text-center">{error}</div>
