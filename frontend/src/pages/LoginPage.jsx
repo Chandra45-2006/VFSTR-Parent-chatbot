@@ -17,23 +17,10 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const { data } = await authAPI.login(regNumber, mobile);
-      localStorage.setItem('pendingRegNo', regNumber);
-      localStorage.setItem('mobileLast4', mobile.slice(-4));
-      if (data.devOtp) localStorage.setItem('devOtp', data.devOtp);
-      navigate('/otp');
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('student', JSON.stringify(data.student));
+      navigate('/dashboard');
     } catch (err) {
-      // Backend offline - demo mode fallback
-      if (!err.response) {
-        const validReg = regNumber.length >= 8;
-        if (validReg && mobile.length === 10) {
-          localStorage.setItem('pendingRegNo', regNumber);
-          localStorage.setItem('mobileLast4', mobile.slice(-4));
-          localStorage.setItem('devOtp', '123456');
-          localStorage.setItem('student', JSON.stringify({ regNo: regNumber, name: 'GADDAM NAGA CHANDRA', branch: 'CSE', semester: 'III-II', cgpa: 7.68 }));
-          navigate('/otp');
-          return;
-        }
-      }
       setError(err.response?.data?.error || err.response?.data?.message || 'Invalid credentials. Please check your Registration Number and Phone Number and try again.');
     } finally {
       setLoading(false);
