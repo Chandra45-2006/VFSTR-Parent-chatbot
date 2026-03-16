@@ -116,7 +116,7 @@ export default function LoginPage() {
 
               <button type="submit" disabled={loading}
                 className="w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white rounded-xl font-bold text-lg shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2 group">
-                <span>{loading ? 'Sending OTP...' : 'Verify Student'}</span>
+                <span>{loading ? 'Please wait, logging in...' : 'Verify Student'}</span>
                 {!loading && <ArrowRight className="size-5 group-hover:translate-x-1 transition-transform" />}
               </button>
             </form>
