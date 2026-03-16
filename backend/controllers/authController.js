@@ -1,16 +1,19 @@
 const Student = require('../models/Student');
 const jwt = require('jsonwebtoken');
-const twilio = require('twilio');
+const axios = require('axios');
 
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 
 const sendSMS = async (phone, otp) => {
-  const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-  await client.messages.create({
-    body: `Your VFSTR Parent Portal OTP is ${otp}. Valid for 5 minutes.`,
-    from: process.env.TWILIO_PHONE_NUMBER,
-    to: `+91${phone}`,
+  const response = await axios.get('https://www.fast2sms.com/dev/bulkV2', {
+    params: {
+      authorization: process.env.FAST2SMS_API_KEY,
+      variables_values: otp,
+      route: 'otp',
+      numbers: phone,
+    },
   });
+  return response.data;
 };
 
 // POST /api/auth/login
@@ -31,23 +34,22 @@ const login = async (req, res) => {
 
     const otp = generateOTP();
     student.otp = otp;
-    student.otpExpires = new Date(Date.now() + 5 * 60 * 1000); // 5 min
+    student.otpExpires = new Date(Date.now() + 5 * 60 * 1000);
     await student.save();
 
     console.log(`\n=============================`);
     console.log(`Generated OTP for ${regNo}: ${otp}`);
     console.log(`=============================\n`);
 
-    // Send OTP via Twilio
     try {
-      await sendSMS(phone, otp);
-      console.log(`SMS sent to +91${phone}`);
-    } catch (smsError) {
-      console.error('Twilio SMS Error:', smsError.message);
+      const result = await sendSMS(phone, otp);
+      console.log('Fast2SMS result:', JSON.stringify(result));
+    } catch (smsErr) {
+      console.error('Fast2SMS error:', smsErr.message);
     }
 
     res.json({
-      message: 'OTP generated successfully',
+      message: 'OTP sent successfully',
       mobileLast4: phone.slice(-4),
       devOtp: process.env.NODE_ENV !== 'production' ? otp : undefined,
     });
@@ -85,7 +87,8 @@ const verifyOTP = async (req, res) => {
         regNo: student.regNo,
         name: student.studentName,
         branch: student.branch,
-        semester: student.semester,
+        year: student.year,
+        section: student.section,
         cgpa: student.cgpa,
       },
     });
