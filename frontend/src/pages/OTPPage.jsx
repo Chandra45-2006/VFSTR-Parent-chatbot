@@ -1,4 +1,4 @@
-ï»¿import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { School, HelpCircle, Smartphone, ArrowLeft, Timer } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -40,39 +40,21 @@ export default function OTPPage() {
     e.preventDefault();
     const otpValue = otp.join('');
     if (otpValue.length < 6) return;
-    setError('Invalid OTP. Please check the code sent to your phone and try again.');
     setLoading(true);
+    setError('');
 
     const regNo = localStorage.getItem('pendingRegNo');
 
-    // Try backend first
     try {
       const { data } = await authAPI.verifyOTP(regNo, otpValue);
       localStorage.setItem('token', data.token);
       localStorage.setItem('student', JSON.stringify(data.student));
       localStorage.removeItem('pendingRegNo');
       navigate('/dashboard');
-      return;
     } catch (err) {
-      // Backend offline or OTP mismatch â€” use demo mode
-      // Any 6-digit OTP is accepted in demo mode
+      setError('Invalid OTP. Please check the code sent to your phone and try again.');
+      setLoading(false);
     }
-
-    // Demo mode fallback â€” accept any 6-digit OTP
-    const student = JSON.parse(localStorage.getItem('student') || 'null');
-    if (!student) {
-      localStorage.setItem('student', JSON.stringify({
-        regNo: regNo || '231FA04D90',
-        name: 'GADDAM NAGA CHANDRA',
-        branch: 'CSE',
-        semester: 'III-II',
-        cgpa: 7.68,
-      }));
-    }
-    localStorage.setItem('token', 'demo-token-' + Date.now());
-    localStorage.removeItem('pendingRegNo');
-    setLoading(false);
-    navigate('/dashboard');
   };
 
   return (
@@ -99,7 +81,7 @@ export default function OTPPage() {
             <h1 className="text-slate-900 text-2xl font-bold mb-2">OTP Verification</h1>
             <p className="text-slate-500 text-sm leading-relaxed">
               {"We've sent a 6-digit code to the registered mobile number"}<br />
-              <span className="font-semibold text-slate-700">+91 â€¢â€¢â€¢â€¢â€¢ â€¢â€¢{mobileLast4}</span>
+              <span className="font-semibold text-slate-700">+91 ••••• ••{mobileLast4}</span>
             </p>
           </div>
 
@@ -114,7 +96,7 @@ export default function OTPPage() {
                   onChange={(e) => handleChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
                   className="w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold border-2 border-slate-200 rounded-xl bg-transparent focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                  placeholder="Â·" />
+                  placeholder="·" />
               ))}
             </div>
 
@@ -143,7 +125,7 @@ export default function OTPPage() {
 
       <footer className="p-6 text-center">
         <p className="text-slate-400 text-[10px] uppercase tracking-widest font-bold">
-          Â© 2026 {"Vignan's"} Foundation for Science, Technology & Research
+          © 2026 {"Vignan's"} Foundation for Science, Technology & Research
         </p>
       </footer>
     </div>
