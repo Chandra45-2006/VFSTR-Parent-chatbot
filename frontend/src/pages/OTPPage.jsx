@@ -40,7 +40,7 @@ export default function OTPPage() {
     e.preventDefault();
     const otpValue = otp.join('');
     if (otpValue.length < 6) return;
-    setError('');
+    setError('Invalid OTP. Please check the code sent to your phone and try again.');
     setLoading(true);
 
     const regNo = localStorage.getItem('pendingRegNo');
@@ -149,4 +149,5 @@ export default function OTPPage() {
     </div>
   );
 }
+
 

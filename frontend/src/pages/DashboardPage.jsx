@@ -6,21 +6,9 @@ import { CheckCircle2, Star, Wallet, Clock, TrendingUp, History, MessageCircle, 
 import { motion, AnimatePresence } from 'motion/react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { cn } from '../lib/utils.js';
-import { useStudent, useAttendance } from '../lib/useStudentData.js';
+import { useStudent, useAttendance, useAcademic, useExams } from '../lib/useStudentData.js';
 
-const attendanceData = [
-  { name: 'Jan', attendance: 85 }, { name: 'Feb', attendance: 92 },
-  { name: 'Mar', attendance: 88 }, { name: 'Apr', attendance: 95 }, { name: 'May', attendance: 82 },
-];
-const performanceData = [
-  { name: 'Sem 1', gpa: 8.2 }, { name: 'Sem 2', gpa: 8.5 },
-  { name: 'Sem 3', gpa: 7.9 }, { name: 'Sem 4', gpa: 8.8 }, { name: 'Sem 5', gpa: 8.4 },
-];
-const subjectDistribution = [
-  { name: 'Present', value: 87, color: '#2563eb' },
-  { name: 'Absent', value: 8, color: '#ef4444' },
-  { name: 'On Leave', value: 5, color: '#10b981' },
-];
+
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -28,10 +16,33 @@ export default function DashboardPage() {
   const [chatInput, setChatInput] = useState('');
   const { student: lsStudent } = useStudent();
   const { data: attData } = useAttendance();
+  const { data: acadData } = useAcademic();
+  const { data: examData } = useExams();
   const student = lsStudent || JSON.parse(localStorage.getItem('student') || 'null') || {};
   const parentName = student.name ? ('Hello, ' + student.name + '!') : 'Hello, G.Sri Hari Babu!';
   const studentRegNo = student.regNo || '231FA04000';
-  const overallAttendance = attData ? attData.overall : 87;
+  const overallAttendance = attData && attData.length ? Math.round(attData.reduce((s, a) => s + a.percentage, 0) / attData.length) : 87;
+
+  // Dynamic chart data from API
+  const attendanceChartData = attData && attData.length
+    ? attData.map(a => ({ name: a.subject.length > 10 ? a.subject.substring(0, 10) + '...' : a.subject, attendance: Math.round(a.percentage) }))
+    : [{ name: 'No Data', attendance: 0 }];
+
+  const performanceData = acadData && acadData.length
+    ? acadData.map(a => ({ name: 'Sem ' + a.semester, gpa: a.sgpa }))
+    : [{ name: 'No Data', gpa: 0 }];
+
+  const examMarksData = examData && examData.length
+    ? examData.map(e => ({ name: e.subject.length > 10 ? e.subject.substring(0, 10) + '...' : e.subject, mid: e.midMarks, final: e.finalMarks, lab: e.labMarks }))
+    : [];
+
+  const totalPresent = attData && attData.length ? attData.reduce((s, a) => s + a.presentClasses, 0) : 87;
+  const totalClasses = attData && attData.length ? attData.reduce((s, a) => s + a.totalClasses, 0) : 100;
+  const totalAbsent = totalClasses - totalPresent;
+  const subjectDistribution = [
+    { name: 'Present', value: totalPresent, color: '#2563eb' },
+    { name: 'Absent', value: totalAbsent, color: '#ef4444' },
+  ];
 
   return (
     <div className="flex min-h-screen bg-[#f5f6f8]">
@@ -111,12 +122,12 @@ export default function DashboardPage() {
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {[
-                  { icon: FileText, label: 'View Results', path: '/academic' },
+                  { icon: FileText, label: 'View Results', path: null },
                   { icon: ClipboardCheck, label: 'Attendance', path: '/attendance' },
                   { icon: History, label: 'Fee History', path: '/fees' },
                   { icon: Calendar, label: 'Exam Schedule', path: '/exams' },
                 ].map((item, i) => (
-                  <button key={i} onClick={() => navigate(item.path)}
+                  <button key={i} onClick={() => item.path ? navigate(item.path) : setShowActivity(true)}
                     className="bg-white p-6 rounded-2xl border border-slate-200 flex flex-col items-center gap-4 hover:border-blue-600 hover:shadow-lg hover:shadow-blue-600/5 transition-all group">
                     <item.icon className="size-8 text-slate-400 group-hover:text-blue-600 transition-colors" />
                     <span className="text-xs font-bold text-slate-700">{item.label}</span>
@@ -182,7 +193,7 @@ export default function DashboardPage() {
                       </div>
                       <div className="h-72 w-full">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={attendanceData}>
+                          <BarChart data={attendanceChartData}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                             <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fontWeight: 600, fill: '#64748b' }} dy={10} />
                             <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fontWeight: 600, fill: '#64748b' }} />
@@ -240,6 +251,28 @@ export default function DashboardPage() {
                       </div>
                     </div>
                   </div>
+                  {examMarksData.length > 0 && (
+                    <div className="bg-slate-50 rounded-3xl p-8">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="p-2 bg-green-50 text-green-600 rounded-xl"><BarChartIcon className="size-5" /></div>
+                        <h3 className="text-lg font-black text-slate-900">Subject-wise Exam Marks</h3>
+                      </div>
+                      <div className="h-72 w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={examMarksData}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fontWeight: 600, fill: '#64748b' }} dy={10} />
+                            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fontWeight: 600, fill: '#64748b' }} />
+                            <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                            <Legend />
+                            <Bar dataKey="mid" name="Mid Marks" fill="#2563eb" radius={[4, 4, 0, 0]} barSize={20} />
+                            <Bar dataKey="final" name="Final Marks" fill="#9333ea" radius={[4, 4, 0, 0]} barSize={20} />
+                            <Bar dataKey="lab" name="Lab Marks" fill="#10b981" radius={[4, 4, 0, 0]} barSize={20} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </motion.div>
             </div>
@@ -272,3 +305,6 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+
+

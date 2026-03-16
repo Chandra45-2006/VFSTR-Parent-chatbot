@@ -34,7 +34,7 @@ export default function LoginPage() {
           return;
         }
       }
-      setError(err.response?.data?.message || 'Login failed. Please check your details.');
+      setError(err.response?.data?.error || err.response?.data?.message || 'Invalid credentials. Please check your Registration Number and Phone Number and try again.');
     } finally {
       setLoading(false);
     }
@@ -154,6 +154,7 @@ export default function LoginPage() {
     </div>
   );
 }
+
 
 
 
